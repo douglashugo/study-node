@@ -3,12 +3,12 @@ import autores from "../models/Autor.js"
 
 class LivroController {
 
-    static async listarLivros(req, res) {
+    static listarLivros = async (req, res) => {
         const listaLivros = await livros.find({});
         res.status(200).json(listaLivros)
     }
 
-    static async obterLivro(req, res) {
+    static obterLivro = async (req, res) => {
         try {
             const id = req.params.id;
             const livroEncontrado = await livros.findById(id);
@@ -18,7 +18,7 @@ class LivroController {
         }
     }
 
-    static async cadastrarLivro(req, res) {
+    static cadastrarLivro = async (req, res) => {
         const novoLivro = req.body;
         try {
             const autorEncontrado = await autores.findById(novoLivro.autor);
@@ -30,7 +30,7 @@ class LivroController {
         }
     }
 
-    static async atualizarLivro(req, res) {
+    static atualizarLivro = async (req, res) => {
         try {
             const novoLivro = await livros.findByIdAndUpdate(req.params.id, req.body, {new: true})
             res.status(200).json({message: "Livro atualizado com sucesso", livros: novoLivro});
@@ -39,7 +39,7 @@ class LivroController {
         }
     }
 
-    static async deletarLivro(req, res) {
+    static deletarLivro = async (req, res) => {
         try {
             const livroDeletado = await livros.findByIdAndDelete(req.params.id, req.body, {new: true})
             res.status(200).json({message: "Livro removido com sucesso", livro: livroDeletado});
@@ -48,13 +48,13 @@ class LivroController {
         }
     }
 
-    static async listarLivrosPorEditora(req, res) {
+    static listarLivrosPorEditora = async (req, res) => {
         try {
             const editora = req.query.editora
             const listaLivrosPorEditora = await livros.find({ editora: editora });
             res.status(200).json({message: "Livro(s) encontrado(s)", livro: listaLivrosPorEditora})
         } catch (error) {
-            
+            res.status(500).json({ message: `${error.message} - Erro interno no servidor` });
         }
     }
 
