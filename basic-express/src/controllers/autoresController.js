@@ -2,9 +2,13 @@ import autores from "../models/Autor.js";
 
 class AutorController {
 
-    static listarAutores = async (req, res) => {
-        const listaAutores = await autores.find({});
-        res.status(200).json(listaAutores)
+    static listarAutores = async (req, res, next) => {
+        try {
+            const listaAutores = await autores.find({});
+            res.status(200).json(listaAutores)
+        } catch (erro) {
+            next(erro)
+        }
     }
 
     static obterAutor = async (req, res, next) => {
@@ -21,30 +25,31 @@ class AutorController {
         }
     }
 
-    static cadastrarAutor = async (req, res) => {
+    static cadastrarAutor = async (req, res, next) => {
         try {
-            const novoAutor = await autores.create(req.body);
-            res.status(201).json({message: "Adicionado com sucesso", autores: novoAutor});
+            let autor = new autores(req.body);
+            const novoAutor = await autor.save();
+            res.status(201).send(novoAutor.toJSON());
         } catch (erro) {
-            res.status(500).json({message: `${erro.message} - Falha ao cadastrar autor`});
+            next(erro)
         }
     }
 
-    static atualizarAutor = async (req, res) => {
+    static atualizarAutor = async (req, res, next) => {
         try {
             const novoAutor = await autores.findByIdAndUpdate(req.params.id, req.body, {new: true})
             res.status(200).json({message: "Autor atualizado com sucesso", autores: novoAutor});
-        } catch (error) {
-            res.status(500).json({message: `${error.message} - Falha ao atualizar autor`});
+        } catch (erro) {
+            next(erro)
         }
     }
 
-    static deletarAutor = async (req, res) => {
+    static deletarAutor = async (req, res, next) => {
         try {
             const autorDeletado = await autores.findByIdAndDelete(req.params.id, req.body, {new: true})
             res.status(200).json({message: "Autor removido com sucesso", autores: autorDeletado});
-        } catch (error) {
-            res.status(500).json({message: `${error.message} - Falha ao deletar autor`});
+        } catch (erro) {
+            next(erro)
         }
     }
 
