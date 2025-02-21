@@ -1,4 +1,4 @@
-import livros from "../models/Livro.js";
+import { livros } from "../models/index.js";
 import NaoEncontrado from "../erros/NaoEncontrado.js";
 
 class LivroController {
@@ -69,10 +69,15 @@ class LivroController {
         }
     }
 
-    static listarLivrosPorEditora = async (req, res, next) => {
+    static listarLivrosPorFiltro = async (req, res, next) => {
         try {
-            const editora = req.query.editora
-            const listaLivrosPorEditora = await livros.find({ "editora": editora });
+            const { editora, titulo } = req.query
+            const busca = {};
+
+            if (editora) busca.editora = editora
+            if (titulo) busca.titulo = titulo
+
+            const listaLivrosPorEditora = await livros.find(busca);
             res.status(200).json({message: "Livro(s) encontrado(s)", livro: listaLivrosPorEditora})
         } catch (erro) {
             next(erro)
