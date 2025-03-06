@@ -72,11 +72,19 @@ class LivroController {
     static listarLivrosPorFiltro = async (req, res, next) => {
         try {
             const busca = await processaDados(req.query)
-            const listaLivrosPorEditora = await livros
-            .find(busca)
-            .populate("autor");
 
-            res.status(200).json({message: "Livro(s) encontrado(s)", livro: listaLivrosPorEditora})
+            if (busca !== null) {
+                const listaLivrosPorEditora = await livros
+                .find(busca)
+                .populate("autor");
+
+                res.status(200).json({message: "Livro(s) encontrado(s)", livro: listaLivrosPorEditora})
+            } else {
+                res.status(200).send([])
+            }
+           
+
+            
         } catch (erro) {
             next(erro)
         }
@@ -86,7 +94,7 @@ class LivroController {
 
 async function processaDados(parametros) {
     const { editora, titulo, minPaginas, maxPaginas, nomeAutor } = parametros
-    const busca = {};
+    let busca = {};
 
     if (minPaginas || maxPaginas) busca.paginas = {}
 
@@ -98,8 +106,12 @@ async function processaDados(parametros) {
 
     if (nomeAutor) {
         const autor = await autores.findOne({ nome: nomeAutor });
-        const autorId = autor._id
-        if (autorId) busca.autor = autorId
+
+        if (autor !== null) {
+            busca.autor = autor._id
+        } else {
+            busca = null;
+        }
     }
 
     return busca
